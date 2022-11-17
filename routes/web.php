@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorizationController;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -17,10 +16,6 @@ use Illuminate\Support\Str;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
 
 Route::get('/auth/login', function (Request $request) {
     $request->session()->put('state', $state = Str::random(40));
@@ -45,7 +40,7 @@ Route::get('/auth/login', function (Request $request) {
         'code_challenge_method' => 'S256',
     ]);
 
-    return redirect('http://localhost/open-id/authorize?'.$query);
+    return redirect('http://my-open-id.test/open-id/authorize?' . $query);
 });
 
 Route::view('login', 'auth.login')->name('login');
@@ -53,9 +48,10 @@ Route::post('login', [AuthController::class, 'postLogin']);
 
 Route::get('/open-id/authorize', [AuthorizationController::class, 'authorizeOpenID']);
 
+Route::middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return view('welcome');
+    })->name('home');
 
-Route::get('/logout', function () {
-    Auth::logout();
-
-    return redirect()->route('login');
+    Route::get('/logout', [AuthController::class, 'logout']);
 });

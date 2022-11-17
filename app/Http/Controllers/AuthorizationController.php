@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -20,18 +21,17 @@ class AuthorizationController extends LaravelAuthorizationController
     public function authorizeOpenID(
         ServerRequestInterface $psrRequest,
         Request $request,
-        ClientRepository $clients,
-        TokenRepository $tokens
     ) {
+        if (!Auth::check()) {
+            throw new AuthenticationException;
+        }
+
         $authRequest = $this->withErrorHandling(function () use ($psrRequest) {
             return $this->server->validateAuthorizationRequest($psrRequest);
         });
 
-        $scopes = $this->parseScopes($authRequest);
-        $user = $request->user();
-        $client = $clients->find($authRequest->getClient()->getIdentifier());
+        $request->session()->put('authToken', Str::random());
 
-        $request->session()->put('authToken', $authToken = Str::random());
         $request->session()->put('authRequest', $authRequest);
 
         return $this->approveOpenID($request);
