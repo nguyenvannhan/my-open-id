@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorizationController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -51,3 +52,10 @@ Route::view('login', 'auth.login')->name('login');
 Route::post('login', [AuthController::class, 'postLogin']);
 
 Route::get('/open-id/authorize', [AuthorizationController::class, 'authorizeOpenID']);
+
+
+Route::get('/logout', function () {
+    Auth::logout();
+
+    return redirect()->route('login');
+});

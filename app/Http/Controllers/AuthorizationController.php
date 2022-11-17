@@ -23,12 +23,6 @@ class AuthorizationController extends LaravelAuthorizationController
         ClientRepository $clients,
         TokenRepository $tokens
     ) {
-        if (!Auth::check()) {
-            $request->session()->put('authorize_url', url()->current());
-
-            return redirect()->route('login');
-        }
-
         $authRequest = $this->withErrorHandling(function () use ($psrRequest) {
             return $this->server->validateAuthorizationRequest($psrRequest);
         });
