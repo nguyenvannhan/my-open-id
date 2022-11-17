@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\AuthorizationController;
+use Illuminate\Contracts\Auth\StatefulGuard;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        //Passport::ignoreRoutes();
+        $this->app->when(AuthorizationController::class)
+                ->needs(StatefulGuard::class)
+                ->give(fn () => Auth::guard(config('passport.guard', null)));
     }
 
     /**
@@ -23,6 +30,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
     }
 }
