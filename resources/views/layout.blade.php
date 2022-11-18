@@ -16,11 +16,7 @@
 </head>
 
 <body>
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh">
-        <div class="border px-5 py-5 rounded-5" style="max-width: 50%; min-width: 30rem;">
-            @yield('content')
-        </div>
-    </div>
+    @yield('content')
 
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"

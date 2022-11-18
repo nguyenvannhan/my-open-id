@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccessTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorizationController;
+use App\Http\Controllers\ClientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -56,4 +57,12 @@ Route::middleware(['auth'])->group(function () {
     })->name('home');
 
     Route::get('/logout', [AuthController::class, 'logout']);
+});
+
+Route::middleware(['is_admin'])->group(function() {
+    Route::get('/clients', [ClientController::class, 'index'])->name('clients.index');
+    Route::get('/clients/create', [ClientController::class, 'create'])->name('clients.create');
+    Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
+    Route::get('/clients/{id}', [ClientController::class, 'edit'])->name('clients.edit');
+    Route::patch('/clients', [ClientController::class, 'update'])->name('clients.update');
 });
