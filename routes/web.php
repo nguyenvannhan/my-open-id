@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccessTokenController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AuthorizationController;
 use Illuminate\Http\Request;
@@ -47,6 +48,7 @@ Route::view('login', 'auth.login')->name('login');
 Route::post('login', [AuthController::class, 'postLogin']);
 
 Route::get('/open-id/authorize', [AuthorizationController::class, 'authorizeOpenID']);
+Route::post('/open-id/token', [AccessTokenController::class, 'token'])->middleware('throttle');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {

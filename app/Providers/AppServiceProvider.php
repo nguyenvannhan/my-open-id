@@ -17,7 +17,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //Passport::ignoreRoutes();
+        Passport::ignoreRoutes();
+
         $this->app->when(AuthorizationController::class)
                 ->needs(StatefulGuard::class)
                 ->give(fn () => Auth::guard(config('passport.guard', null)));
