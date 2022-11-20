@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Contracts\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Laravel\Passport\ClientRepository;
 use Laravel\Passport\Http\Rules\RedirectRule;
 use Laravel\Passport\Passport;
@@ -21,7 +23,7 @@ class ClientController extends Controller
 
     public function index(): View
     {
-        $clients = Passport::client()->orderBy('name', 'DESC')->get();
+        $clients = Passport::client()->where('revoked', false)->orderBy('name', 'DESC')->get();
 
         if (!Passport::$hashesClientSecrets) {
             $client = $clients->makeVisible('secret');
@@ -73,7 +75,8 @@ class ClientController extends Controller
     {
         $clientRepo = Passport::client();
 
-        $client = $clientRepo->where($clientRepo->getKeyName(), $id)->first();
+        $client = $clientRepo->where($clientRepo->getKeyName(), $id)
+            ->where('revoked', false)->first();
 
         if ($client) {
             return view('clients.edit')->with([
@@ -86,9 +89,14 @@ class ClientController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $this->validation->make($request->only(['id']), [
+            'id' => 'required|string|max:191'
+        ])->validate();
+
         $clientRepo = Passport::client();
 
-        $client = $clientRepo->where($clientRepo->getKeyName(), $request->id)->first();
+        $client = $clientRepo->where($clientRepo->getKeyName(), $id)
+            ->where('revoked', false)->first();
 
         if (is_null($client)) {
             abort(404);
@@ -109,6 +117,30 @@ class ClientController extends Controller
 
         return back()->withInput()->withErrors([
             'update' => __('Update Failed')
+        ]);
+    }
+
+    public function delete(Request $request): JsonResponse
+        {
+        $this->validation->make($request->only(['id']), [
+            'id' => 'required|string|max:191',
+        ])->validate();
+
+        $clientRepo = Passport::client();
+
+        $client = $clientRepo->where($clientRepo->getKeyName(), $request->id)
+            ->where('revoked', false)->first();
+
+        if (is_null($client)) {
+            return response()->json([
+                'message' => _('Can not find client'),
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $this->clients->delete($client);
+
+        return response()->json([
+            'message' => __('Delete Client Successfully'),
         ]);
     }
 }

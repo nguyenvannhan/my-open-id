@@ -65,4 +65,5 @@ Route::middleware(['is_admin'])->group(function() {
     Route::post('/clients', [ClientController::class, 'store'])->name('clients.store');
     Route::get('/clients/{id}', [ClientController::class, 'edit'])->name('clients.edit');
     Route::patch('/clients', [ClientController::class, 'update'])->name('clients.update');
+    Route::delete('/clients', [ClientController::class, 'delete'])->name('clients.delete');
 });

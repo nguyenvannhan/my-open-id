@@ -24,7 +24,9 @@
                             <td>{{ $client->id }}</td>
                             <td>{{ $client->redirect }} </td>
                             <td>
-                                <a href="{{ route('clients.edit', [ 'id' => $client->id ]) }}" class="mx-2">Edit</a>
+                                <a href="{{ route('clients.edit', ['id' => $client->id]) }}" class="mx-2">Edit</a>
+                                <a href="#" data-id="{{ $client->id }}"
+                                    class="mx-2 delete-btn text-danger">Delete</a>
                             </td>
                         </tr>
                     @endforeach
@@ -32,4 +34,36 @@
             </table>
         </div>
     </div>
+@endsection
+
+@section('script')
+    <script>
+        $(document).ready(function() {
+            const deleteUrl = "{{ route('clients.delete') }}";
+
+            $('.delete-btn').on('click', function(e) {
+                e.preventDefault();
+
+                if (confirm('Do you really want to delete this client?') == true) {
+                    const id = $(this).data('id');
+
+                    $.ajax({
+                        url: deleteUrl,
+                        type: 'DELETE',
+                        data: {
+                            id
+                        },
+                        success: function(res) {
+                            alert('Delete client successfully!')
+
+                            window.location.reload();
+                        },
+                        error: function(xhr, status, err) {
+                            alert('Delete client Failed')
+                        },
+                    });
+                }
+            });
+        });
+    </script>
 @endsection
